@@ -156,12 +156,12 @@ body {
     background-color: var(--body-bg); /* Inner container gets the theme background */
     display: flex;
     flex-direction: column;
-    height: 94vh;
+    height: 92vh;
     border-radius: 8px; /* Match parent's rounded corners */
     min-width: 0; /* Prevents content from overflowing its container */
     width: 98%;
     margin-left: 1%;
-    margin-top: 2%;
+    margin-top: 4%;
 }
 
 .chat-header {
@@ -173,7 +173,7 @@ body {
     border-bottom: 1px solid #444;
     justify-content: space-between;
     min-height: 50px;
-    margin-top: 4%;
+    
 }
 
 .header-account-btn {

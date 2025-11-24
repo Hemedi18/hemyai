@@ -156,7 +156,7 @@ hr{
     min-width: 0; /* Prevents content from overflowing its container */
     
 }
-.form-container:hover {
+.form-container:hover, .register:hover {
     
     transform: translateY(-5px);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);

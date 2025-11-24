@@ -222,33 +222,23 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
 
-        // --- POLLING FOR NEW MESSAGES (every 2s) ---
-        // Requires getMessagesUrl to be set in the template (e.g. "/api/chat/messages/")
         
-        // Fix messages that were inserted as plain text (no children) by parsing them to HTML
         function fixUnformattedMessages() {
             document.querySelectorAll('.ai-message:not(.loading-dots)').forEach(el => {
-                // skip if already processed
                 if (el.dataset.formatted === 'true') return;
-                if (el.children.length === 0) {
-                    const raw = el.textContent.trim();
-                    if (!raw) return;
-                    el.innerHTML = marked.parse(raw);
-                    processAiMessage(el);
-                    el.dataset.formatted = 'true';
-                } else {
-                    // if element already contains HTML, ensure process has run once
-                    if (!el.dataset.formatted) {
-                        processAiMessage(el);
-                        el.dataset.formatted = 'true';
-                    }
-                }
+                // decode any entities if content was escaped
+                const raw = decodeHtml(el.innerHTML || el.textContent || '').trim();
+                if (!raw) return;
+                // parse + sanitize
+                el.innerHTML = DOMPurify.sanitize(marked.parse(raw));
+                processAiMessage(el);
+                el.dataset.formatted = 'true';
             });
         }
 
         function pollNewMessages() {
-            if (typeof getMessagesUrl === 'undefined') return; // noop if not provided
-            if (!currentSessionId) return; // wait until we have a session
+            if (typeof getMessagesUrl === 'undefined') return;
+            if (!currentSessionId) return;
 
             fetch(`${getMessagesUrl}?session_id=${encodeURIComponent(currentSessionId)}`, {
                 headers: { 'Accept': 'application/json' }
@@ -265,22 +255,25 @@ document.addEventListener('DOMContentLoaded', function() {
                         } else {
                             const aiDiv = document.createElement('div');
                             aiDiv.classList.add('chat-message', 'ai-message');
-                            // insert raw text for typewriter or immediate parse:
-                            aiDiv.textContent = msg.content;
                             chatBox.appendChild(aiDiv);
-                            // mark as unformatted; next fixUnformattedMessages call will parse & enhance
+
+                            // decode entities, typewrite plain text, then parse+sanitize
+                            const decoded = decodeHtml(msg.content || '');
+                            typewriterEffect(aiDiv, decoded, (raw) => {
+                                aiDiv.innerHTML = DOMPurify.sanitize(marked.parse(raw));
+                                processAiMessage(aiDiv);
+                                aiDiv.dataset.formatted = 'true';
+                            });
                         }
                     });
                     lastMessageCount = total;
                     chatBox.scrollTop = chatBox.scrollHeight;
                 }
 
-                // Always attempt to fix any AI messages that are still raw/plain-text
+                // Always try to fix any leftovers
                 fixUnformattedMessages();
             })
-            .catch(err => {
-                console.debug('pollNewMessages error', err);
-            });
+            .catch(err => console.debug('pollNewMessages error', err));
         }
 
         // start polling every 2 seconds
@@ -315,3 +308,10 @@ document.addEventListener('DOMContentLoaded', function() {
     initChatForm();
     initHelpModal();
 });
+
+// helper: decode HTML entities to plain text
+function decodeHtml(html) {
+    const txt = document.createElement('textarea');
+    txt.innerHTML = html;
+    return txt.value;
+}

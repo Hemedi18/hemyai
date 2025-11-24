@@ -156,12 +156,12 @@ body {
     background-color: var(--body-bg); /* Inner container gets the theme background */
     display: flex;
     flex-direction: column;
-    height: 96vh;
+    height: 94vh;
     border-radius: 8px; /* Match parent's rounded corners */
     min-width: 0; /* Prevents content from overflowing its container */
     width: 98%;
     margin-left: 1%;
-    margin-top: 1%;
+    margin-top: 2%;
 }
 
 .chat-header {
@@ -173,6 +173,7 @@ body {
     border-bottom: 1px solid #444;
     justify-content: space-between;
     min-height: 50px;
+    margin-top: 4%;
 }
 
 .header-account-btn {
@@ -273,6 +274,7 @@ body {
     padding: 10px;
     border-top: 1px solid #444;
     background-color: var(--body-bg);
+    margin-bottom: 4%;
 }
 
 .chat-input textarea {

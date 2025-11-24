@@ -39,7 +39,7 @@ body {
 .main-container {
     /* Animated Border Logic */
     padding: 2px; /* This creates the space for the border */
-    background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+    background: linear-gradient(45deg, #5c0000, #5e2a00, #888600, #227900, #00836d, #001686, #3c007c, #6e0056, #720000,#ff7b00, #5eff00, #00f7ff, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000 );
     background-size: 400% 400%;
     animation: animated-border 20s linear infinite;
 
@@ -66,7 +66,7 @@ body {
     position: absolute; /* Make it an overlay on all screen sizes */
     height: 100%;
     transform: translateX(-100%);
-    background-color: #202123;
+    background-color: #3e4b4d;
 }
 
 .sidebar-header {
@@ -254,6 +254,7 @@ body {
     /* Animated Text Color */
     background: linear-gradient(90deg, #a8eb12, #00bf72, #008793, #004d7a);
     background-size: 200% 200%;
+    --we: text;
     -webkit-text-fill-color: transparent;
     animation: animate-text-color 5s ease infinite;
 }
@@ -363,20 +364,20 @@ body {
         opacity: 0;
         transform: translateY(15px);
     }
-    to {
+    to  {
         opacity: 1;
         transform: translateY(0);
     }
 }
 
 @keyframes animated-border {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
 
 @keyframes animate-text-color {
-    0% {
+    0%  {
         background-position: 0% 50%;
     }
     50% {

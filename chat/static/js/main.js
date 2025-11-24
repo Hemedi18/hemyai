@@ -315,3 +315,46 @@ function decodeHtml(html) {
     txt.innerHTML = html;
     return txt.value;
 }
+
+// Try to convert any AI messages that are still plain/escaped text into sanitized HTML
+function fixUnformattedMessages() {
+    document.querySelectorAll('.ai-message:not(.loading-dots)').forEach(el => {
+        if (el.dataset.formatted === 'true') return;
+        // prefer textContent (already-decoded) but decode innerHTML if needed
+        const raw = decodeHtml(el.textContent || el.innerHTML || '').trim();
+        if (!raw) return;
+        el.innerHTML = DOMPurify.sanitize(marked.parse(raw));
+        processAiMessage(el);
+        el.dataset.formatted = 'true';
+    });
+}
+
+// --- AUTO POLL / AUTO-RELOAD CONTROLS ---
+// If you want a hard page reload when unformatted messages persist, set to true.
+const AUTO_FULL_RELOAD = false; // <-- change to true to force full reload every INTERVAL_MS when unformatted exist
+const INTERVAL_MS = 2000;
+
+// Start a lightweight interval that:
+//  - Calls existing pollNewMessages if available
+//  - Runs fixUnformattedMessages to auto-format messages
+//  - Optionally triggers a full reload if problems persist
+const __autoFormatInterval = setInterval(() => {
+    try {
+        if (typeof pollNewMessages === 'function') {
+            pollNewMessages(); // existing poll (safe if defined)
+        }
+        fixUnformattedMessages();
+
+        if (AUTO_FULL_RELOAD) {
+            const pending = document.querySelectorAll('.ai-message:not([data-formatted="true"])').length;
+            if (pending > 0) {
+                // only reload when there are still pending unformatted messages
+                window.location.reload();
+            }
+        }
+    } catch (e) {
+        console.debug('auto-format interval error', e);
+    }
+}, INTERVAL_MS);
+
+window.addEventListener('beforeunload', () => clearInterval(__autoFormatInterval));

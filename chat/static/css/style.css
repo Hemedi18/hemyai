@@ -254,7 +254,6 @@ body {
     /* Animated Text Color */
     background: linear-gradient(90deg, #a8eb12, #00bf72, #008793, #004d7a);
     background-size: 200% 200%;
-    -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: animate-text-color 5s ease infinite;
 }

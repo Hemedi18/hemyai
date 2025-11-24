@@ -96,43 +96,26 @@ document.addEventListener('DOMContentLoaded', function() {
      * @param {string} text - The full string to type out.
      * @param {function} callback - A function to call after typing is complete.
      */
-    function typewriterEffect(element, text, callback) {
+    function typewriterEffect(element, rawText, callback) {
+        // Type plain text into element.textContent, then call callback(rawText)
         let i = 0;
-        element.innerHTML = ""; // Clear the element first
-        const speed = 20; // Speed in milliseconds
+        element.textContent = ''; // ensure plain text while typing
+        const speed = 15; // ms per character
 
-        // Resolve chat box reliably: prefer closest ancestor with id 'chatBox', fallback to document lookup
+        // find chat box to keep it scrolled
         const chatBoxEl = element.closest('#chatBox') || document.getElementById('chatBox');
 
-        function type() {
-            if (i >= text.length) {
-                if (callback) callback();
+        function step() {
+            if (i >= rawText.length) {
+                if (typeof callback === 'function') callback(rawText);
                 return;
             }
-
-            // If the current character is the start of an HTML tag, find the end and add the whole tag at once
-            if (text.charAt(i) === '<') {
-                const tagEnd = text.indexOf('>', i);
-                if (tagEnd !== -1) {
-                    element.innerHTML += text.substring(i, tagEnd + 1);
-                    i = tagEnd + 1;
-                } else {
-                    // malformed tag fallback: add char and advance
-                    element.innerHTML += text.charAt(i);
-                    i++;
-                }
-            } else {
-                // Otherwise, just add the character
-                element.innerHTML += text.charAt(i);
-                i++;
-            }
-
-            if (chatBoxEl) {
-                chatBoxEl.scrollTop = chatBoxEl.scrollHeight; // Scroll as content is added
-            }
-            setTimeout(type, speed);
+            element.textContent += rawText.charAt(i);
+            i++;
+            if (chatBoxEl) chatBoxEl.scrollTop = chatBoxEl.scrollHeight;
+            setTimeout(step, speed);
         }
-        type();
+        step();
     }
 
     /**
@@ -216,11 +199,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 aiMessageDiv.classList.add('chat-message', 'ai-message');
                 chatBox.appendChild(aiMessageDiv);
 
-                // 1. Parse the raw markdown from the AI into HTML first.
-                const formattedHtml = marked.parse(data.message);
-
-                // Use the typewriter effect, and process the message once it's done typing.
-                typewriterEffect(aiMessageDiv, formattedHtml, () => processAiMessage(aiMessageDiv));
+                // Use typewriter on RAW markdown, then parse & enhance once typing finishes
+                typewriterEffect(aiMessageDiv, data.message, (raw) => {
+                    aiMessageDiv.innerHTML = marked.parse(raw);
+                    processAiMessage(aiMessageDiv);
+                    aiMessageDiv.dataset.formatted = 'true';
+                });
                 
                 // If this was a new chat, we get a new session ID back
                 // We reload the page with the new session_id to update the history list

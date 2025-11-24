@@ -240,6 +240,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // --- POLLING FOR NEW MESSAGES (every 2s) ---
         // Requires getMessagesUrl to be set in the template (e.g. "/api/chat/messages/")
+        
+        // Fix messages that were inserted as plain text (no children) by parsing them to HTML
+        function fixUnformattedMessages() {
+            document.querySelectorAll('.ai-message:not(.loading-dots)').forEach(el => {
+                // skip if already processed
+                if (el.dataset.formatted === 'true') return;
+                if (el.children.length === 0) {
+                    const raw = el.textContent.trim();
+                    if (!raw) return;
+                    el.innerHTML = marked.parse(raw);
+                    processAiMessage(el);
+                    el.dataset.formatted = 'true';
+                } else {
+                    // if element already contains HTML, ensure process has run once
+                    if (!el.dataset.formatted) {
+                        processAiMessage(el);
+                        el.dataset.formatted = 'true';
+                    }
+                }
+            });
+        }
+
         function pollNewMessages() {
             if (typeof getMessagesUrl === 'undefined') return; // noop if not provided
             if (!currentSessionId) return; // wait until we have a session
@@ -251,26 +273,28 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (!data || !Array.isArray(data.messages)) return;
                 const total = data.messages.length;
-                if (total <= lastMessageCount) return; // no new messages
+                if (total > lastMessageCount) {
+                    const newMsgs = data.messages.slice(lastMessageCount);
+                    newMsgs.forEach(msg => {
+                        if (msg.sender === 'user') {
+                            chatBox.insertAdjacentHTML('beforeend', `<div class="chat-message user-message">${msg.content}</div>`);
+                        } else {
+                            const aiDiv = document.createElement('div');
+                            aiDiv.classList.add('chat-message', 'ai-message');
+                            // insert raw text for typewriter or immediate parse:
+                            aiDiv.textContent = msg.content;
+                            chatBox.appendChild(aiDiv);
+                            // mark as unformatted; next fixUnformattedMessages call will parse & enhance
+                        }
+                    });
+                    lastMessageCount = total;
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }
 
-                const newMsgs = data.messages.slice(lastMessageCount);
-                newMsgs.forEach(msg => {
-                    if (msg.sender === 'user') {
-                        chatBox.insertAdjacentHTML('beforeend', `<div class="chat-message user-message">${msg.content}</div>`);
-                    } else {
-                        const aiDiv = document.createElement('div');
-                        aiDiv.classList.add('chat-message', 'ai-message');
-                        // insert parsed HTML and enhance (no typewriter to avoid duplicate typing)
-                        aiDiv.innerHTML = marked.parse(msg.content);
-                        chatBox.appendChild(aiDiv);
-                        processAiMessage(aiDiv);
-                    }
-                });
-                lastMessageCount = total;
-                chatBox.scrollTop = chatBox.scrollHeight;
+                // Always attempt to fix any AI messages that are still raw/plain-text
+                fixUnformattedMessages();
             })
             .catch(err => {
-                // silently ignore polling errors
                 console.debug('pollNewMessages error', err);
             });
         }
@@ -279,7 +303,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const pollInterval = setInterval(pollNewMessages, 2000);
         window.addEventListener('beforeunload', () => clearInterval(pollInterval));
 
-        // you may want to call pollNewMessages() once immediately to sync
+        // run once immediately to sync & fix formatting of existing messages
         pollNewMessages();
     }
 

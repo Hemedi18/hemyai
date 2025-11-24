@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
     /**
      * Handles theme toggling and persists the choice in localStorage.
      */
+
+
     function initThemeToggler() {
         const themeToggler = document.getElementById('theme-toggler');
         if (!themeToggler) return;
@@ -53,17 +55,22 @@ document.addEventListener('DOMContentLoaded', function() {
      * @param {HTMLElement} aiMessageElement - The div element of the AI message.
      */
     function processAiMessage(aiMessageElement) {
-        // Get the raw text and parse it into HTML using marked.js
-        const rawContent = aiMessageElement.innerHTML;
-        aiMessageElement.innerHTML = marked.parse(rawContent);
+        // If element has no child elements, assume it contains raw markdown text and parse it.
+        if (aiMessageElement.children.length === 0) {
+            const rawContent = aiMessageElement.textContent;
+            aiMessageElement.innerHTML = marked.parse(rawContent);
+        }
 
-        // Find all code blocks within the newly parsed message
+        // Now find and enhance code blocks (works whether we just parsed or it was already HTML)
         aiMessageElement.querySelectorAll('pre code').forEach((block) => {
             // Apply syntax highlighting
             hljs.highlightElement(block);
 
-            // Create a container for the code block and copy button
+            // Avoid wrapping the same pre twice
             const preElement = block.parentElement;
+            if (preElement.parentElement && preElement.parentElement.classList.contains('code-container')) return;
+
+            // Create a container for the code block and copy button
             const codeContainer = document.createElement('div');
             codeContainer.className = 'code-container';
             preElement.parentNode.insertBefore(codeContainer, preElement);
@@ -94,6 +101,9 @@ document.addEventListener('DOMContentLoaded', function() {
         element.innerHTML = ""; // Clear the element first
         const speed = 20; // Speed in milliseconds
 
+        // Resolve chat box reliably: prefer closest ancestor with id 'chatBox', fallback to document lookup
+        const chatBoxEl = element.closest('#chatBox') || document.getElementById('chatBox');
+
         function type() {
             if (i >= text.length) {
                 if (callback) callback();
@@ -106,13 +116,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (tagEnd !== -1) {
                     element.innerHTML += text.substring(i, tagEnd + 1);
                     i = tagEnd + 1;
+                } else {
+                    // malformed tag fallback: add char and advance
+                    element.innerHTML += text.charAt(i);
+                    i++;
                 }
             } else {
                 // Otherwise, just add the character
                 element.innerHTML += text.charAt(i);
                 i++;
             }
-            chatBox.scrollTop = chatBox.scrollHeight; // Scroll as content is added
+
+            if (chatBoxEl) {
+                chatBoxEl.scrollTop = chatBoxEl.scrollHeight; // Scroll as content is added
+            }
             setTimeout(type, speed);
         }
         type();
@@ -234,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (e.target === helpModal) { helpModal.style.display = 'none'; }
         });
     }
-
+ 
     // --- INITIALIZE ALL MODULES ---
     initThemeToggler();
     // Format any messages that were loaded from the server on page load

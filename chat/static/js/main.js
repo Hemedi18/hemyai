@@ -148,6 +148,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // This variable will hold the current session ID
         let currentSessionId = new URLSearchParams(window.location.search).get('session_id');
 
+        // track how many messages are currently shown to append only new ones
+        let lastMessageCount = chatBox.querySelectorAll('.chat-message').length;
+
         // --- LOADING ANIMATION FUNCTIONS ---
         function showLoadingAnimation() {
             const loadingHTML = `
@@ -234,6 +237,50 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Error:', error);
             });
         });
+
+        // --- POLLING FOR NEW MESSAGES (every 2s) ---
+        // Requires getMessagesUrl to be set in the template (e.g. "/api/chat/messages/")
+        function pollNewMessages() {
+            if (typeof getMessagesUrl === 'undefined') return; // noop if not provided
+            if (!currentSessionId) return; // wait until we have a session
+
+            fetch(`${getMessagesUrl}?session_id=${encodeURIComponent(currentSessionId)}`, {
+                headers: { 'Accept': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data || !Array.isArray(data.messages)) return;
+                const total = data.messages.length;
+                if (total <= lastMessageCount) return; // no new messages
+
+                const newMsgs = data.messages.slice(lastMessageCount);
+                newMsgs.forEach(msg => {
+                    if (msg.sender === 'user') {
+                        chatBox.insertAdjacentHTML('beforeend', `<div class="chat-message user-message">${msg.content}</div>`);
+                    } else {
+                        const aiDiv = document.createElement('div');
+                        aiDiv.classList.add('chat-message', 'ai-message');
+                        // insert parsed HTML and enhance (no typewriter to avoid duplicate typing)
+                        aiDiv.innerHTML = marked.parse(msg.content);
+                        chatBox.appendChild(aiDiv);
+                        processAiMessage(aiDiv);
+                    }
+                });
+                lastMessageCount = total;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            })
+            .catch(err => {
+                // silently ignore polling errors
+                console.debug('pollNewMessages error', err);
+            });
+        }
+
+        // start polling every 2 seconds
+        const pollInterval = setInterval(pollNewMessages, 2000);
+        window.addEventListener('beforeunload', () => clearInterval(pollInterval));
+
+        // you may want to call pollNewMessages() once immediately to sync
+        pollNewMessages();
     }
 
     /**

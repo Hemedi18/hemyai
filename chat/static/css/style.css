@@ -1,0 +1,387 @@
+/* =================================== */
+/*  1. THEME VARIABLES & BASE STYLES   */
+/* =================================== */
+:root {
+    --font-main: 'system-ui', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    
+    /* Dark Theme (Default) */
+    --body-bg: #343541;
+    --text-color: #ececec;
+    --form-bg: #40414f; /* CORRECTED: Dark background for forms */
+    --form-text-color: #ececec; /* CORRECTED: Light text for forms */
+    --input-border-color: #555; /* CORRECTED: Darker border for inputs */
+    --ai-msg-bg: #444654;
+    --user-msg-bg: #007bff;
+}
+
+.light-theme {
+    /* Light Theme */
+    --body-bg: #f0f2f5;
+    --text-color: #1c1e21;
+    --form-bg: #fff;
+    --form-text-color: #333;
+    --input-border-color: #ddd;
+    --ai-msg-bg: #e9ecef;
+    --user-msg-bg: #007bff;
+}
+
+body { 
+    background-color: var(--body-bg); 
+    font-family: var(--font-main);
+    margin: 0;
+    overflow: hidden; /* Prevent scrolling on the body */
+    transition: background-color 0.4s ease; /* Smooth theme transition */
+}
+
+/* =================================== */
+/*  2. CHAT PAGE LAYOUT & SIDEBAR      */
+/* =================================== */
+.main-container {
+    /* Animated Border Logic */
+    padding: 2px; /* This creates the space for the border */
+    background: linear-gradient(45deg, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+    background-size: 400% 400%;
+    animation: animated-border 20s linear infinite;
+
+    /* Layout Logic */
+    position: fixed;
+    width: 98%;
+    height: 98vh;
+    box-sizing: border-box;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 10px; /* Rounded corners for the container */
+    overflow: hidden; /* Hide anything that might spill out */
+}
+
+.sidebar {
+    width: 260px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    transition: transform 0.3s ease;
+    z-index: 101;
+    position: absolute; /* Make it an overlay on all screen sizes */
+    height: 100%;
+    transform: translateX(-100%);
+    background-color: #202123;
+}
+
+.sidebar-header {
+    padding: 10px;
+    border-bottom: 1px solid #444;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.new-chat-btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #343541;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 5px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 1em;
+    text-decoration: none;
+}
+.new-chat-btn:hover {
+    background-color: #444654;
+}
+
+.chat-history {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-top: 10px;
+    width: 100%;
+}
+
+.chat-history h2 {
+    font-size: 0.9em;
+    color: #8e8e8e;
+    padding: 0 10px 10px;
+    text-transform: uppercase;
+}
+
+.chat-history ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.chat-history li a {
+    display: block;
+    padding: 10px 15px;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chat-history li a:hover {
+    background-color: #343541;
+}
+
+.sidebar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* Sidebar Active State */
+.main-container.sidebar-active .sidebar {
+    transform: translateX(0);
+}
+
+.main-container.sidebar-active .sidebar-overlay {
+    opacity: 1;
+    visibility: visible;
+}
+
+.chat-container {
+    flex-grow: 1;
+    background-color: var(--body-bg); /* Inner container gets the theme background */
+    display: flex;
+    flex-direction: column;
+    height: 96vh;
+    border-radius: 8px; /* Match parent's rounded corners */
+    min-width: 0; /* Prevents content from overflowing its container */
+    width: 98%;
+    margin-left: 1%;
+    margin-top: 1%;
+}
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: var(--body-bg);
+    color: var(--text-color);
+    border-bottom: 1px solid #444;
+    justify-content: space-between;
+    min-height: 50px;
+}
+
+.header-account-btn {
+    flex-grow: 1;
+    text-align: center;
+    color: var(--text-color);
+    font-size: 1.6rem;
+    text-decoration: none;
+}
+
+.sidebar-toggler, .theme-toggler-btn {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.5rem;
+    padding: 0 10px;
+    cursor: pointer;
+}
+.sidebar-toggler:hover, .theme-toggler-btn:hover {
+    transform: scale(1.15);
+}
+
+.chat-box {
+    flex-grow: 1;
+    padding: 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    color: var(--text-color);
+}
+
+.chat-message {
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    border-radius: 18px;
+    line-height: 1.5;
+    animation: message-fade-in 0.5s ease-out;
+    word-wrap: break-word;
+}
+
+.user-message {
+    background-color: var(--user-msg-bg);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+    max-width: 75%; /* Set max-width specifically for user messages */
+}
+
+.ai-message {
+    background-color: var(--ai-msg-bg);
+    color: var(--text-color);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+    width: 100%; /* FORCE AI messages to take full width */
+    box-sizing: border-box; /* Ensure padding is included in the width */
+}
+
+.welcome-message {
+    /* Glassmorphism Effect */
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); /* For Safari */
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    
+    /* Centering and Sizing */
+    padding: 2rem 3rem;
+    margin: auto; /* This will center it in the flex container */
+    max-width: 500px;
+
+    /* Font Styling */
+    font-family: 'Poppins', sans-serif;    
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-align: center;
+
+    /* Animated Text Color */
+    background: linear-gradient(90deg, #a8eb12, #00bf72, #008793, #004d7a);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: animate-text-color 5s ease infinite;
+}
+
+.loading-dots .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--text-color);
+    margin: 0 2px;
+    animation: dot-bounce 1.4s infinite ease-in-out both;
+}
+
+.chat-input {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #444;
+    background-color: var(--body-bg);
+}
+
+.chat-input textarea {
+    flex-grow: 1;
+    border-radius: 5px;
+    padding: 10px 18px;
+    border: 1px solid #555;
+    background-color: #40414f; /* Keep this specific for contrast */
+    color: white;
+    resize: none; /* Disable manual resizing by the user */
+    font-family: inherit;
+    font-size: 1em;
+    max-height: 100px; /* Limit growth */
+}
+
+.chat-input button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 0 20px;
+    margin-left: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+}
+.chat-input button:hover {
+    transform: scale(1.1);
+}
+
+.ai-message p {
+    margin: 0 0 1rem 0; /* Add some space between paragraphs */
+}
+.ai-message p:last-child {
+    margin-bottom: 0;
+}
+
+.ai-message pre {
+    /* REMOVED: Let highlight.js theme handle the background for consistency */
+    border-radius: 8px;
+    padding: 16px;
+    margin: 0; /* Reset margin as it's handled by the container */
+    word-wrap: break-word;
+}
+
+.ai-message code {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9em;
+}
+
+.code-container {
+    position: relative;
+    margin: 1rem 0;
+    width: 98%;
+}
+
+.copy-code-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #3d3d3d;
+    color: #ccc;
+    border: 1px solid #555;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    opacity: 0; /* Hidden by default */
+    transition: opacity 0.3s ease;
+}
+
+.copy-code-btn:hover {
+    background-color: #555;
+}
+
+.code-container:hover .copy-code-btn {
+    opacity: 1; /* Show on hover */
+}
+
+@keyframes dot-bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1.0); }
+}
+.loading-dots .dot:nth-child(1) { animation-delay: -0.32s; }
+.loading-dots .dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes message-fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes animated-border {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+@keyframes animate-text-color {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}

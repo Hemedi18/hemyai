@@ -1,0 +1,264 @@
+/* =================================== */
+/*  1. FORM PAGE WRAPPERS              */
+/* =================================== */
+
+body{
+     /* Animated Text Color */
+    background: linear-gradient(90deg, #a8eb12, #00bf72, #008793, #004d7a);
+    background-size: 200% 200%;
+    animation: animate-text-color 5s ease infinite;
+}
+.auth-page-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    box-sizing: border-box;
+
+}
+
+.auth-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    z-index: 10;
+    background: linear-gradient(90deg, #002514, #005f52, #018c91, #01b9b9);
+}
+hr{
+    border: none;
+    border-top: 1px solid #ccc;
+    margin: 10px 0;
+}
+
+/* =================================== */
+/*  2. HEADER BUTTONS (BACK, HELP, THEME) */
+/* =================================== */
+.header-btn {
+    background-color: inherit;
+    color: #03e92a;
+    border: 1px solid #03e92a;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+.header-btn:hover { background-color: #dee2e6; }
+.back-button { font-size: 1.2rem; }
+.help-button { font-size: 1.4rem; }
+.theme-toggler-btn { font-size: 1.5rem; }
+
+/* =================================== */
+/*  3. HELP MODAL (PASSWORD PAGE)      */
+/* =================================== */
+.help-modal-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.help-modal-content {
+    background: #fff;
+    padding: 30px 40px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.help-modal-content h3 {
+    margin-top: 0;
+    color: #333;
+    font-size: 1.5rem;
+}
+
+.help-modal-content ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.help-modal-content li {
+    margin-bottom: 10px;
+    color: #555;
+    padding-left: 25px;
+    position: relative;
+}
+
+.help-modal-content li::before {
+    content: '✓';
+    color: #28a745;
+    position: absolute;
+    left: 0;
+}
+
+.close-modal {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 2rem;
+    color: #aaa;
+    cursor: pointer;
+}
+.close-modal:hover { color: #333; }
+
+/* =================================== */
+/*  4. MAIN FORM CONTAINER & CARD      */
+/* =================================== */
+.form-container {
+    /* Use theme variables */
+    background: var(--form-bg);
+    color: var(--form-text-color);
+
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: left;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-height: 90vh;
+    border-radius: 8px; /* Match parent's rounded corners */
+    min-width: 0; /* Prevents content from overflowing its container */
+    margin: 5% 1%;
+    
+
+}
+
+.register{
+    background: var(--form-bg);
+    color: var(--form-text-color);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    margin: 4% auto;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    min-height: 120vh;
+    border-radius: 8px; /* Match parent's rounded corners */
+    min-width: 0; /* Prevents content from overflowing its container */
+    
+}
+.form-container:hover {
+    
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.auth-form {
+    padding-top: 1rem;
+    margin-top: 1rem;
+    text-align: left;
+
+}
+
+.auth-form h2 {
+    margin-bottom: 1.5rem;
+    color: var(--form-text-color);
+    font-size: 2rem;
+}
+
+.auth-form p {
+    margin-bottom: 1rem;
+    padding: .5rem;
+}
+
+/* =================================== */
+/*  5. FORM ELEMENTS & LINKS           */
+/* =================================== */
+.auth-form input {
+    width: 96%;
+    padding: 0.75rem;
+    margin: .3rem;
+    border: 1px solid var(--input-border-color);
+    border-radius: 5px;
+    box-sizing: border-box; /* Important for padding and width to work together */
+    transition: border-color 0.3s ease;
+}
+
+.field-error {
+    color: #dc3545;
+    font-size: 0.875em;
+    text-align: left;
+    margin-top: -0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.auth-form input:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.auth-form button {
+    width: 96%;
+    margin-left: 2%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.auth-form button:hover {
+    background-color: #0056b3;
+    transform: scale(1.02);
+}
+
+.account-button {
+    display: block;
+    width: 90%;
+    padding: 0.75rem;
+    border: 1px solid #007bff;
+    border-radius: 5px;
+    background-color: #007bff;
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+.account-button:hover { background-color: #0056b3; }
+
+.account-button.logout { 
+    background-color: #dc3545; border-color: #dc3545; 
+}
+.account-button.logout:hover { background-color: #c82333; }
+
+.form-switch-link {
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.form-switch-link a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.form-switch-link a:hover {
+    text-decoration: underline;
+}
+

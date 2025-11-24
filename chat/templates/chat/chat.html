@@ -1,0 +1,47 @@
+{% extends 'chat/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="main-container" id="main-container">
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <a href="{% url 'chat' %}" class="new-chat-btn"> + New Chat</a>
+        </div>
+        <div class="chat-history">
+            <h2>History</h2>
+            <ul id="chat-history-list">
+                {% for session in chat_sessions %}
+                    <li><a href="?session_id={{ session.id }}">{{ session.title|default:"New Chat" }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="chat-container">
+      <div class="chat-header">
+        <button class="sidebar-toggler" id="sidebar-toggler" title="Toggle History"><i class="fas fa-history"></i></button>
+        <!-- Account button is now in the middle -->
+        <a href="{% url 'account' %}" class="header-account-btn" title="Account"><i class="fas fa-user-circle"></i></a>
+        <button type="button" id="theme-toggler" class="theme-toggler-btn">🌙</button>
+      </div>
+        <div class="chat-box" id="chatBox">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="chat-message {% if message.is_from_user %}user-message{% else %}ai-message{% endif %}">{{ message.content|safe }}</div>
+                {% endfor %}
+            {% else %}
+                <div class="welcome-message">Welcome to Hemy AI.<br>How can I help you today?</div>
+            {% endif %}
+        </div>
+        <form class="chat-input" id="chatForm">
+            {% csrf_token %}
+            
+            <textarea id="userInput" placeholder="Type your message..." rows="1"></textarea>
+    
+            <button type="submit" id="sendButton" title="Send"><i class="fas fa-paper-plane"></i></button>
+            
+        </form>
+    </div>
+</div>
+
+{% endblock %}

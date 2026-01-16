@@ -1,13 +1,6 @@
 {% extends 'chat/base.html' %}
 
 {% block content %}
-<!-- Markdown Libraries -->
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
-<!-- Highlight.js -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-
 <div class="chat-wrapper">
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
@@ -49,7 +42,7 @@
                     {% if not message.is_from_user %}
                         <div class="small text-primary mb-1 fw-bold">Hemy AI</div>
                     {% endif %}
-                    <div class="message-content">{{ message.content }}</div>
+                    {{ message.content|linebreaksbr }}
                 </div>
             {% endfor %}
         </div>
@@ -70,48 +63,6 @@
     const userInput = document.getElementById('user-input');
     const messagesContainer = document.getElementById('messages-container');
     let sessionId = "{{ active_session.id|default:'' }}";
-
-    // Configure Marked.js
-    marked.use({
-        breaks: true, // Enable line breaks
-        gfm: true     // Enable GitHub Flavored Markdown
-    });
-
-    // Function to add syntax highlighting and copy buttons
-    function processCodeBlocks(element) {
-        element.querySelectorAll('pre code').forEach((block) => {
-            // Apply syntax highlighting
-            hljs.highlightElement(block);
-
-            // Create Copy Button
-            const pre = block.parentElement;
-            if (pre.querySelector('.copy-btn')) return;
-
-            const button = document.createElement('button');
-            button.className = 'copy-btn btn btn-sm btn-dark';
-            button.innerHTML = '<i class="fa-regular fa-copy"></i>';
-            button.title = 'Copy code';
-            
-            button.addEventListener('click', () => {
-                navigator.clipboard.writeText(block.textContent).then(() => {
-                    button.innerHTML = '<i class="fa-solid fa-check"></i>';
-                    setTimeout(() => { button.innerHTML = '<i class="fa-regular fa-copy"></i>'; }, 2000);
-                });
-            });
-            pre.appendChild(button);
-        });
-    }
-
-    // Render Markdown for existing messages on load
-    document.addEventListener("DOMContentLoaded", function() {
-        document.querySelectorAll('.message-content').forEach(el => {
-            const rawContent = el.textContent;
-            // Parse markdown and sanitize HTML
-            el.innerHTML = DOMPurify.sanitize(marked.parse(rawContent));
-            processCodeBlocks(el);
-        });
-        scrollToBottom();
-    });
 
     // Auto-scroll to bottom
     function scrollToBottom() {
@@ -177,11 +128,8 @@
     function appendMessage(content, isUser) {
         const div = document.createElement('div');
         div.className = `message-bubble ${isUser ? 'user' : 'ai'} fade-in`;
-        
-        const htmlContent = DOMPurify.sanitize(marked.parse(content));
-        div.innerHTML = isUser ? htmlContent : `<div class="small text-primary mb-1 fw-bold">Hemy AI</div>${htmlContent}`;
+        div.innerHTML = isUser ? content : `<div class="small text-primary mb-1 fw-bold">Hemy AI</div>${content.replace(/\n/g, '<br>')}`;
         messagesContainer.appendChild(div);
-        processCodeBlocks(div);
     }
 
     function appendLoading(id) {

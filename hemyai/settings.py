@@ -13,14 +13,14 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 # /home/hacker/Desktop/hemy_ai/hemyai/settings.py
 import os
+from dotenv import load_dotenv
 
 # hemyai/settings.py
 
 
-
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
@@ -33,7 +33,7 @@ SECRET_KEY = 'django-insecure-h*5f%tt^8l5#q(del9uem9h*lap@_-pflp7$4jp+mb=ep2+jx$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.pythonanywhere.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['.pythonanywhere.com', 'localhost', '127.0.0.1','0.0.0.0']
 
 
 # Application definition
@@ -137,13 +137,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # adding .env for securing api keys and sensitive data
-
-from dotenv import load_dotenv
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 

@@ -22,7 +22,6 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow-x: hidden;
 }
 
 /* Animations */
@@ -105,7 +104,6 @@ input:focus, textarea:focus, select:focus {
     flex-direction: column;
     background: transparent;
     position: relative;
-    min-width: 0;
 }
 
 .messages-container {
@@ -125,52 +123,6 @@ input:focus, textarea:focus, select:focus {
     position: relative;
     font-size: 0.95rem;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-    word-break: break-word;
-    hyphens: auto;
-}
-
-/* Markdown Styles within Bubbles */
-.message-bubble pre {
-    background: rgba(0, 0, 0, 0.3);
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    overflow-x: auto;
-    margin-top: 0.5rem;
-    margin-bottom: 0.5rem;
-    position: relative;
-    max-width: 100%;
-}
-
-.message-bubble code {
-    font-family: 'Courier New', Courier, monospace;
-    background: rgba(0, 0, 0, 0.2);
-    padding: 0.1rem 0.3rem;
-    border-radius: 0.25rem;
-    font-size: 0.9em;
-}
-
-/* Copy Button Styles */
-.copy-btn {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    opacity: 0.6;
-    transition: opacity 0.2s;
-    padding: 0.2rem 0.5rem;
-}
-
-.copy-btn:hover {
-    opacity: 1;
-}
-
-.message-bubble p {
-    margin-bottom: 0.5rem;
-}
-
-.message-bubble p:last-child {
-    margin-bottom: 0;
 }
 
 .message-bubble.user {
@@ -202,7 +154,6 @@ input:focus, textarea:focus, select:focus {
     border-radius: 2rem;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
-    min-width: 0;
 }
 
 .chat-input:focus {
@@ -239,13 +190,5 @@ input:focus, textarea:focus, select:focus {
     }
     .sidebar.show {
         transform: translateX(0);
-    }
-
-    .messages-container {
-        padding: 0.5rem;
-    }
-
-    .message-bubble {
-        max-width: 99%;
     }
 }

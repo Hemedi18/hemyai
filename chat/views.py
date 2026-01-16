@@ -52,14 +52,23 @@ def get_ai_response(request):
                 session = ChatSession.objects.create(user=request.user, title=user_message_content[:50])
 
             # Save user message
-            ChatMessage.objects.create(session=session, content=user_message_content, is_from_user=True)
+            user_message = ChatMessage.objects.create(session=session, content=user_message_content, is_from_user=True)
 
             # Get AI response
             try:
                 genai.configure(api_key=str(settings.GEMINI_API_KEY))
                 # CORRECTED: Using a valid and available model name.
                 model = genai.GenerativeModel("gemini-2.5-flash") 
-                response = model.generate_content(user_message_content)
+                
+                # Build chat history for context
+                history = []
+                previous_messages = session.messages.exclude(id=user_message.id).order_by('timestamp')
+                for msg in previous_messages:
+                    role = "user" if msg.is_from_user else "model"
+                    history.append({"role": role, "parts": [msg.content]})
+                
+                chat = model.start_chat(history=history)
+                response = chat.send_message(user_message_content)
                 ai_response_content = response.text
             except Exception as e:
                 # If the AI service fails, return a user-friendly error message.
